@@ -9,68 +9,51 @@ import org.json.JSONObject;
 
 import Server.Game_Server;
 import Server.game_service;
-import oop_dataStructure.OOP_DGraph;
-import oop_dataStructure.oop_edge_data;
-import oop_dataStructure.oop_graph;
-/**
- * This class represents a simple example for using the GameServer API:
- * the main file performs the following tasks:
- * 1. Creates a game_service [0,23] (line 36)
- * 2. Constructs the graph from JSON String (lines 37-39)
- * 3. Gets the scenario JSON String (lines 40-41)
- * 4. Prints the fruits data (lines 49-50)
- * 5. Add a set of robots (line 52-53) // note: in general a list of robots should be added
- * 6. Starts game (line 57)
- * 7. Main loop (should be a thread) (lines 59-60)
- * 8. move the robot along the current edge (line 74)
- * 9. direct to the next edge (if on a node) (line 87-88)
- * 10. prints the game results (after "game over"): (line 63)
- *  
- * @author boaz.benmoshe
- *
- */
-public class SimpleGameClient {
-	public static void main(String[] a) {
-		test1();}
-	public static void test1() {
-		int scenario_num = 23;
+import dataStructure.DGraph;
+import dataStructure.edge_data;
+
+public class myGameClient {
+	private DGraph graph;
+
+	public void start(int scenario_num) {
 		game_service game = Game_Server.getServer(scenario_num); // you have [0,23] games
 		String g = game.getGraph();
-		OOP_DGraph gg = new OOP_DGraph();
-		gg.init(g);
+		this.graph.init(g);
 		String info = game.toString();
 		JSONObject line;
 		try {
 			line = new JSONObject(info);
 			JSONObject ttt = line.getJSONObject("GameServer");
-			int rs = ttt.getInt("robots");
+			int numOfRobots = ttt.getInt("robots");
 			System.out.println(info);
 			System.out.println(g);
 			// the list of fruits should be considered in your solution
-			Iterator<String> f_iter = game.getFruits().iterator();
-			while(f_iter.hasNext()) {System.out.println(f_iter.next());}	
-			int src_node = 0;  // arbitrary node, you should start at one of the fruits
-			for(int a = 0;a<rs;a++) {
-				game.addRobot(src_node+a);
+			Iterator<String> fruits = game.getFruits().iterator();
+			while (fruits.hasNext()) {
+				System.out.println(fruits.next());
 			}
+			int src_node = 0; // arbitrary node, you should start at one of the fruits
+			for (int a = 0; a < numOfRobots; a++) {
+				game.addRobot(src_node + a);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
 		}
-		catch (JSONException e) {e.printStackTrace();}
 		game.startGame();
 		// should be a Thread!!!
-		while(game.isRunning()) {
-			moveRobots(game, gg);
+		while (game.isRunning()) {
+			moveRobots(game, this.graph);
 		}
 		String results = game.toString();
-		System.out.println("Game Over: "+results);
+		System.out.println("Game Over: " + results);
 	}
 	/** 
 	 * Moves each of the robots along the edge, 
 	 * in case the robot is on a node the next destination (next edge) is chosen (randomly).
 	 * @param game
 	 * @param gg
-	 * @param log
 	 */
-	private static void moveRobots(game_service game, oop_graph gg) {
+	private static void moveRobots(game_service game, DGraph gg) {
 		List<String> log = game.move();
 		if(log!=null) {
 			long t = game.timeToEnd();
@@ -98,12 +81,12 @@ public class SimpleGameClient {
 	 * a very simple random walk implementation!
 	 * @param g
 	 * @param src
-	 * @return
+	 * @return the dest node
 	 */
-	private static int nextNode(oop_graph g, int src) {
+	private static int nextNode(DGraph g, int src) {
 		int ans = -1;
-		Collection<oop_edge_data> ee = g.getE(src);
-		Iterator<oop_edge_data> itr = ee.iterator();
+		Collection<edge_data> ee = g.getE(src);
+		Iterator<edge_data> itr = ee.iterator();
 		int s = ee.size();
 		int r = (int)(Math.random()*s);
 		int i=0;
@@ -111,5 +94,4 @@ public class SimpleGameClient {
 		ans = itr.next().getDest();
 		return ans;
 	}
-
 }
