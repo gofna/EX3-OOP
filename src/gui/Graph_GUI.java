@@ -22,25 +22,26 @@ public class Graph_GUI implements Runnable {
 	public Graph_GUI(graph g) {
 		this.g = g;
 		StdDraw.gui = this;
+		StdDraw.setCanvasSize(700, 600);
+		StdDraw.enableDoubleBuffering();
 		initGUI();
 		this.count = this.g.getMC();
 		Thread t1 = new Thread(this);
-		t1.start();
+		t1.start();	
 
 	}
 
 	public void initGUI() {
 		StdDraw.clear();
-		StdDraw.setCanvasSize(700, 600);
 		Rx = findRangeX();
         Ry = findRangeY();
-        StdDraw.setXscale(Rx.get_min()-50,Rx.get_max()+50);
-        StdDraw.setYscale(Ry.get_min()-50,Ry.get_max()+50);
+        StdDraw.setXscale(Rx.get_min()-0.006,Rx.get_max()+0.006);
+        StdDraw.setYscale(Ry.get_min()-0.006,Ry.get_max()+0.006);
 
 		if (this.g != null) {
 			for (node_data n : this.g.getV()) {
 				StdDraw.setPenColor(Color.BLUE);
-				StdDraw.filledCircle(n.getLocation().x(), n.getLocation().y(), 1.2); // draw circle blue
+				StdDraw.filledCircle(n.getLocation().x(), n.getLocation().y(), 0.0002); // draw circle blue
 				StdDraw.text(n.getLocation().x() + 2, n.getLocation().y() + 2, String.valueOf(n.getKey()));
 				if (this.g.getE(n.getKey()) != null) {
 					for (edge_data e : this.g.getE(n.getKey())) {
@@ -51,13 +52,13 @@ public class Graph_GUI implements Runnable {
 						StdDraw.setPenColor(Color.BLACK);
 						double x = (n.getLocation().x() + g.getNode(e.getDest()).getLocation().x()) / 2;
 						double y = (n.getLocation().y() + g.getNode(e.getDest()).getLocation().y()) / 2;
-						StdDraw.text(x + 0.5, y + 0.5, String.valueOf(e.getWeight()));
+					//	StdDraw.text(x + 0.0005, y + 0.0005, String.valueOf(e.getWeight()));
 
 						StdDraw.setPenRadius();
 						StdDraw.setPenColor(Color.GREEN);
 						double x1 = 0.1 * n.getLocation().x() + 0.9 * g.getNode(e.getDest()).getLocation().x();
 						double y1 = 0.1 * n.getLocation().y() + 0.9 * g.getNode(e.getDest()).getLocation().y();
-						StdDraw.filledCircle(x1, y1, 0.8);
+						StdDraw.filledCircle(x1, y1, 0.0001);
 					}
 				}
 			}

@@ -75,6 +75,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
+import javax.swing.plaf.FileChooserUI;
 
 import dataStructure.node_data;
 import gui.Graph_GUI;
@@ -713,7 +714,7 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	private static JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar(); // create menu bar
 		JMenu file = new JMenu("File"); // Bottom
-		JMenu features = new JMenu("features"); // bottom
+		JMenu features = new JMenu("Mode"); // bottom
 		menuBar.add(file);
 		menuBar.add(features);
 		JMenuItem save = new JMenuItem(" Save...   ");
@@ -1725,7 +1726,7 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	 * This method cannot be called directly.
 	 */
 	public void actionPerformed(ActionEvent e) {
-//
+
 //		String str = e.getActionCommand();
 //		if (str.equals(" Save...   ")) {
 //			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a txt extension", FileDialog.SAVE);
