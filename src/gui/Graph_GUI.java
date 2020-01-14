@@ -42,7 +42,7 @@ public class Graph_GUI implements Runnable {
 			for (node_data n : this.g.getV()) {
 				StdDraw.setPenColor(Color.BLUE);
 				StdDraw.filledCircle(n.getLocation().x(), n.getLocation().y(), 0.0002); // draw circle blue
-				StdDraw.text(n.getLocation().x() + 2, n.getLocation().y() + 2, String.valueOf(n.getKey()));
+				StdDraw.text(n.getLocation().x() + 0.0003, n.getLocation().y() + 0.0003, String.valueOf(n.getKey()));
 				if (this.g.getE(n.getKey()) != null) {
 					for (edge_data e : this.g.getE(n.getKey())) {
 						StdDraw.setPenColor(Color.RED);
@@ -59,6 +59,7 @@ public class Graph_GUI implements Runnable {
 						double x1 = 0.1 * n.getLocation().x() + 0.9 * g.getNode(e.getDest()).getLocation().x();
 						double y1 = 0.1 * n.getLocation().y() + 0.9 * g.getNode(e.getDest()).getLocation().y();
 						StdDraw.filledCircle(x1, y1, 0.0001);
+						StdDraw.setPenColor(Color.BLACK);
 					}
 				}
 			}

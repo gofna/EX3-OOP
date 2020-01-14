@@ -78,6 +78,7 @@ import javax.swing.KeyStroke;
 import javax.swing.plaf.FileChooserUI;
 
 import dataStructure.node_data;
+import gameClient.MyGameGUI;
 import gui.Graph_GUI;
 
 /**
@@ -714,14 +715,13 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	private static JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar(); // create menu bar
 		JMenu file = new JMenu("File"); // Bottom
-		JMenu features = new JMenu("Mode"); // bottom
+		JMenu features = new JMenu("start"); // bottom
 		menuBar.add(file);
 		menuBar.add(features);
 		JMenuItem save = new JMenuItem(" Save...   ");
 		JMenuItem open = new JMenuItem(" Open...   ");
-		JMenuItem shortPath = new JMenuItem("shortest path");
-		JMenuItem isConnected = new JMenuItem("is connected");
-		JMenuItem tsp = new JMenuItem("TSP");
+		JMenuItem manual = new JMenuItem("start manual game");
+		JMenuItem automatic = new JMenuItem("start automatic game");
 		save.addActionListener(std);
 
 		save.setAccelerator(
@@ -732,14 +732,12 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		open.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-		shortPath.addActionListener(std);
-		isConnected.addActionListener(std);
-		tsp.addActionListener(std);
+		manual.addActionListener(std);
+		automatic.addActionListener(std);
 		file.add(save);
 		file.add(open);
-		features.add(shortPath);
-		features.add(isConnected);
-		features.add(tsp);
+		features.add(manual);
+		features.add(automatic);
 		return menuBar;
 	}
 
@@ -1726,7 +1724,15 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	 * This method cannot be called directly.
 	 */
 	public void actionPerformed(ActionEvent e) {
-
+//		String str = e.getActionCommand();
+//		if (e.getSource() == "CHOOSE") {
+//			if(MyGameGUI.manual.isSelected()) {
+//				MyGameGUI.mode = true;
+//			}
+//			else {
+//				MyGameGUI.mode = false;
+//			}
+//		}
 //		String str = e.getActionCommand();
 //		if (str.equals(" Save...   ")) {
 //			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a txt extension", FileDialog.SAVE);
@@ -1748,27 +1754,6 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 //			}
 //		}
 //
-//		if (str.equals("shortest path")) {
-//			gui.initGUI();
-//			JFrame srcDest = new JFrame();
-//			String src = JOptionPane.showInputDialog(srcDest, "insert source key:");
-//			JFrame srcDest1 = new JFrame();
-//			String dest = JOptionPane.showInputDialog(srcDest1, "insert destination key:");
-//			double w = gui.drawShotrestPath(Integer.parseInt(src), Integer.parseInt(dest));
-//			JFrame weight = new JFrame();
-//			JOptionPane.showMessageDialog(weight, "the shortest path cost :" + w);
-//
-//		}
-//
-//		if (str.equals("is connected")) {
-//			boolean con = gui.isConnect();
-//			JFrame iscon = new JFrame();
-//			if (con) {
-//				JOptionPane.showMessageDialog(iscon, "The Graph is connected.");
-//			} else {
-//				JOptionPane.showMessageDialog(iscon, "The Graph is not connected.");
-//			}
-//		}
 //
 //		if (str.equals("TSP")) {
 //			gui.initGUI();
