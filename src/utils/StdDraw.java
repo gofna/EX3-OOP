@@ -1743,7 +1743,6 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 
 			autoGame auto = new autoGame();
 
-			auto.start();
 
 		}
 //		String str = e.getActionCommand();
@@ -1767,35 +1766,6 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 //			}
 //		}
 //
-//
-//		if (str.equals("TSP")) {
-//			gui.initGUI();
-//			JFrame Targets = new JFrame();
-//			String list = JOptionPane.showInputDialog(Targets, "insert keys with (,) between: ");
-//			String[] keys = list.split(",");
-//			
-//			LinkedList<Integer> targets = new LinkedList<Integer>();
-//			StringBuilder pathString = new StringBuilder();
-//			for (String s : keys) {
-//				targets.add(Integer.parseInt(s));
-//			}
-//
-//			List<node_data> path = StdDraw.gui.drawTSP(targets);
-//			
-//			if (path.size() > 0) {
-//
-//				pathString.append("" + path.get(0).getKey() + "-> ");
-//				for (int i = 1; i < path.size(); i++) {
-//					if (i != path.size() - 1)
-//						pathString.append("" + path.get(i).getKey() + "-> ");
-//					else
-//						pathString.append("" + path.get(i).getKey());
-//				}
-//				JOptionPane.showMessageDialog(Targets, pathString);
-//			} else {
-//				JOptionPane.showMessageDialog(Targets, "There is no  path between the nodes or the list graph is not connected.");
-//			}
-//		}
 	}
 
 	/***************************************************************************

@@ -26,16 +26,18 @@ public class MyGameGUI implements Runnable {
 	DGraph graph;
 	public Graph_GUI gui;
 	private Graph_Algo ga;
+	public autoGame gameA;
 	List<fruit> fruits = new LinkedList<fruit>();
 	public game_service game;
 	public int senario;
 	public int numOfRobots;
+	public boolean auto;
 
 	public MyGameGUI() {
 		openWindow();
+		this.game = Game_Server.getServer(this.senario); // you have [0,23] games
 		StdDraw.game = this;
 		Thread t = new Thread(gui);
-		this.game = Game_Server.getServer(this.senario); // you have [0,23] games
 		String g = game.getGraph();
 		this.graph = new DGraph();
 		this.graph.init(g);
@@ -106,10 +108,10 @@ public class MyGameGUI implements Runnable {
 				game.chooseNextEdge(id, dest);
 			}
 		}
-		 game.chooseNextEdge(id, nextKey);
+		game.chooseNextEdge(id, nextKey);
 	}
 
-	public boolean checkClickR() {
+	public void checkClickR() {
 		List<String> log = game.getRobots();
 		if (log != null) {
 			for (int i = 0; i < log.size(); i++) {
@@ -127,7 +129,6 @@ public class MyGameGUI implements Runnable {
 						id = rid;
 						posR = src;
 						// System.out.println("id " + id);
-						return true;
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -135,7 +136,6 @@ public class MyGameGUI implements Runnable {
 			}
 
 		}
-		return false;
 	}
 
 	public void checkClickN() {
@@ -145,7 +145,6 @@ public class MyGameGUI implements Runnable {
 					&& StdDraw.mouseY() < n.getLocation().y() + 0.0003 && id != -1) {
 				nextNode = n.getKey();
 				System.out.println("key + id  " + nextNode + "   " + id);
-				manualMove(id, nextNode);
 				;
 			}
 		}
@@ -187,7 +186,7 @@ public class MyGameGUI implements Runnable {
 			JSONObject line = new JSONObject(info);
 			JSONObject ttt = line.getJSONObject("GameServer");
 			int score = ttt.getInt("grade");
-			StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.004, "score : " + score);
+			StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.002, "score : " + score);
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -202,15 +201,16 @@ public class MyGameGUI implements Runnable {
 				checkClickR();
 				checkClickN();
 			}
-			if(posR != -1 && nextNode != -1 && id != -1) {
+			if (posR != -1 && nextNode != -1 && id != -1) {
 				manualMove(id, nextNode);
 			}
+
 
 			this.gui.initGUI();
 			if (System.currentTimeMillis() - first >= 1000) {
 				StdDraw.setPenColor();
 				StdDraw.setPenRadius(0.02);
-				StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.005,
+				StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.003,
 						"time to end : " + this.game.timeToEnd() / 1000);
 				StdDraw.setPenRadius();
 			}
@@ -225,7 +225,7 @@ public class MyGameGUI implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		StdDraw.setCanvasSize(700, 600);
+		StdDraw.setCanvasSize(800, 600);
 		// MyGameGUI myGame = new MyGameGUI();
 
 	}

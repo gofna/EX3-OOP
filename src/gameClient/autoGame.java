@@ -30,6 +30,7 @@ public class autoGame implements Runnable {
 	public autoGame() {
 		MyGameGUI gui = new MyGameGUI();
 		this.game = gui.game;
+		gui.auto = true;
 		String g = game.getGraph();
 		this.graph = new DGraph();
 		this.graph.init(g);
@@ -43,7 +44,7 @@ public class autoGame implements Runnable {
 			this.numOfRobots = ttt.getInt("robots");
 			System.out.println(info);
 			System.out.println(g);
-			Iterator<String> f_iter = game.getFruits().iterator();
+			Iterator<String> f_iter = gui.game.getFruits().iterator();
 			while(f_iter.hasNext()) {
 				fruit fr = new fruit(f_iter.next());
 				this.fruits.add(fr);
@@ -92,7 +93,7 @@ public class autoGame implements Runnable {
 	public void moveRobots(game_service game, DGraph gg, int ind) {
 		List<String> log = game.move();
 		if (log != null) {
-			long time = game.timeToEnd();
+			long time = this.game.timeToEnd();
 			for (int i = 0; i < log.size(); i++) {
 				String robot_json = log.get(i);
 				try {
@@ -105,15 +106,15 @@ public class autoGame implements Runnable {
 							List<node_data> nodes = this.ga.shortestPath(src, e.getSrc());
 							if (nodes == null) {
 								dest = e.getDest();
-								game.chooseNextEdge(ind, e.getDest());
+								gui.game.chooseNextEdge(ind, e.getDest());
 							} else {
 								for (node_data n : nodes) {
 									dest = n.getKey();
-									game.chooseNextEdge(ind, dest);
+									gui.game.chooseNextEdge(ind, dest);
 								}
 								// dest = nextNode(gg, src);
 								dest = e.getDest();
-								game.chooseNextEdge(ind, e.getDest());
+								gui.game.chooseNextEdge(ind, e.getDest());
 							}
 							System.out.println("Turn to node: " + dest + "  time to end:" + (time / 1000));
 							System.out.println(ttt);
@@ -129,7 +130,7 @@ public class autoGame implements Runnable {
 
 	private edge_data nextEdge(int robotPos) { // give the edge with the fruit with the shortest path
 		this.fruits.clear();
-		Iterator<String> f_iter = this.game.getFruits().iterator();
+		Iterator<String> f_iter = gui.game.getFruits().iterator();
 		while (f_iter.hasNext()) {
 			fruit f = new fruit(f_iter.next().toString());
 			this.fruits.add(f);
@@ -193,7 +194,7 @@ public class autoGame implements Runnable {
 	public void run() {
 		while (game.isRunning()) {
 			for (int j = 0; j < this.game.getRobots().size(); j++) {
-				this.moveRobots(game, this.graph, j);
+				moveRobots(gui.game, this.graph, j);
 			}
 		}
 	}
