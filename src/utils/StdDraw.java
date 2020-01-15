@@ -79,6 +79,7 @@ import javax.swing.plaf.FileChooserUI;
 
 import dataStructure.node_data;
 import gameClient.MyGameGUI;
+import gameClient.autoGame;
 import gui.Graph_GUI;
 
 /**
@@ -1723,16 +1724,28 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	/**
 	 * This method cannot be called directly.
 	 */
+
+	public static MyGameGUI game;
+	public static autoGame autogame;
+
 	public void actionPerformed(ActionEvent e) {
-//		String str = e.getActionCommand();
-//		if (e.getSource() == "CHOOSE") {
-//			if(MyGameGUI.manual.isSelected()) {
-//				MyGameGUI.mode = true;
-//			}
-//			else {
-//				MyGameGUI.mode = false;
-//			}
-//		}
+		String str = e.getActionCommand();
+		if (str.equals("start manual game")) {
+			StdDraw.clear();
+			game = new MyGameGUI();
+			// this.game.getGame().stopGame();
+			game.placeRobot();
+
+		}
+		if (str.equals("start automatic game")) {
+			// this.autogame = new autoGame(this.game.senario);
+			// game = new MyGameGUI();
+
+			autoGame auto = new autoGame();
+
+			auto.start();
+
+		}
 //		String str = e.getActionCommand();
 //		if (str.equals(" Save...   ")) {
 //			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a txt extension", FileDialog.SAVE);
@@ -1839,7 +1852,10 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	 * This method cannot be called directly.
 	 */
 	public void mouseClicked(MouseEvent e) {
-		// this body is intentionally left empty
+//		StdDraw.enableDoubleBuffering();
+//		this.game.checkClickR();
+//		this.game.checkClickN();
+//		StdDraw.show();
 	}
 
 	/**
