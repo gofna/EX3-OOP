@@ -58,7 +58,6 @@ public class MyGameGUI implements Runnable {
 		this.gui.initGUI();
 		drawFruits();
 		StdDraw.show();
-		t.start();
 	}
 
 	public game_service getGame() {
@@ -88,7 +87,10 @@ public class MyGameGUI implements Runnable {
 			StdDraw.picture(n.getLocation().x(), n.getLocation().y(), "robot.jpg", 0.002, 0.001);
 			StdDraw.show();
 		}
-
+		if(this.game.isRunning()) {
+			StdDraw.clear();
+			this.game.stopGame();
+		}
 		t.start();
 		this.game.startGame();
 	}
@@ -186,31 +188,180 @@ public class MyGameGUI implements Runnable {
 			JSONObject line = new JSONObject(info);
 			JSONObject ttt = line.getJSONObject("GameServer");
 			int score = ttt.getInt("grade");
-			StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.002, "score : " + score);
+			StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.0015, "score : " + score);
 
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void start() {
+		
+		node_data n = this.graph.getNode(0);
+		for (int a = 0; a < this.numOfRobots; a++) { // put the robot in start position
+			n = this.graph.getNode(findFirstPos().getSrc());
+			this.game.addRobot(n.getKey());
+			StdDraw.picture(n.getLocation().x(), n.getLocation().y(), "robot.jpg", 0.002, 0.001);
+		}
+		
+		
+		if(this.game.isRunning()) {
+			StdDraw.clear();
+			this.game.stopGame();
+		}
+		this.game.startGame();
+		Thread t = new Thread(this);
+		t.start();
+		String results = this.game.toString();
+		System.out.println("Game Over: " + results);
+	}
+	
+	private edge_data findFirstPos() { // find an edge with fruit to put the robot in the node
+		double maxVal = 0;
+		fruit maxF = null;
+		int i;
+		int index = 0;
+		edge_data e = this.graph.getEdge(0, 1);
+		for (i = 0; i < this.fruits.size(); i++) { // find the fruit with the best value
+			if (this.fruits.get(i).getValue() > maxVal) {
+				maxVal = this.fruits.get(i).getValue();
+				maxF = this.fruits.get(i);
+				index = i;
+			}
+		}
+		e = findEdgeFruit(maxF, index);
+		return e;
+	}
+	
+
+	public void moveRobots(game_service game, DGraph gg, int ind) {
+		List<String> log = game.move();
+		if (log != null) {
+			long time = this.game.timeToEnd();
+			for (int i = 0; i < log.size(); i++) {
+				String robot_json = log.get(i);
+				try {
+					JSONObject line = new JSONObject(robot_json);
+					JSONObject ttt = line.getJSONObject("Robot");
+					int src = ttt.getInt("src");
+					int dest = ttt.getInt("dest");
+						if (dest == -1) {
+							edge_data e = nextEdge(src);
+							List<node_data> nodes = this.ga.shortestPath(src, e.getSrc());
+							if (nodes == null) {
+								dest = e.getDest();
+								this.game.chooseNextEdge(ind, e.getDest());
+							} else {
+								for (node_data n : nodes) {
+									dest = n.getKey();
+									this.game.chooseNextEdge(ind, dest);
+								}
+								// dest = nextNode(gg, src);
+								dest = e.getDest();
+								this.game.chooseNextEdge(ind, e.getDest());
+							}
+							System.out.println("Turn to node: " + dest + "  time to end:" + (time / 1000));
+							System.out.println(ttt);
+
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+	
+
+	private edge_data nextEdge(int robotPos) { // give the edge with the fruit with the shortest path
+		this.fruits.clear();
+		Iterator<String> f_iter = this.game.getFruits().iterator();
+		while (f_iter.hasNext()) {
+			fruit f = new fruit(f_iter.next().toString());
+			this.fruits.add(f);
+		}
+		double minPath = Double.POSITIVE_INFINITY;
+		int bestSrc = robotPos;
+		int bestDest = robotPos;
+		for (int i = 0; i < this.fruits.size(); i++) {
+			edge_data e = findEdgeFruit(this.fruits.get(i), i);
+			if (this.ga.shortestPathDist(robotPos, e.getSrc()) < minPath) {
+				minPath = this.ga.shortestPathDist(robotPos, e.getSrc());
+				bestSrc = e.getSrc();
+				bestDest = e.getDest();
+			}
+		}
+		return this.graph.getEdge(bestSrc, bestDest);
+	}
+	
+
+	public edge_data findEdgeFruit(fruit fr, int index) {
+		int src = 0;
+		int dest = 0;
+		for (node_data n : this.graph.getV()) {
+			for (edge_data e : this.graph.getE(n.getKey())) {
+				double dFruit = (Math.sqrt(Math.pow(n.getLocation().x() - fr.getLocation().x(), 2)
+						+ Math.pow(n.getLocation().y() - fr.getLocation().y(), 2)))
+						+ Math.sqrt(Math.pow(this.graph.getNode(e.getDest()).getLocation().x() - fr.getLocation().x(),
+								2)
+								+ Math.pow(this.graph.getNode(e.getDest()).getLocation().y() - fr.getLocation().y(),
+										2));
+				double dNodes = (Math.sqrt(
+						Math.pow(n.getLocation().x() - this.graph.getNode(e.getDest()).getLocation().x(), 2) + Math
+								.pow(n.getLocation().y() - this.graph.getNode(e.getDest()).getLocation().y(), 2)));
+				double highNode = this.graph.getNode(e.getSrc()).getLocation().y()
+						- this.graph.getNode(e.getDest()).getLocation().y();
+				if (Math.abs(dNodes - dFruit) < 0.0001) {
+					if (fr.getType() == -1) { // if its banana
+						if (highNode < 1) {
+							src = this.graph.getNode(e.getSrc()).getKey();
+							dest = this.graph.getNode(e.getDest()).getKey();
+						} else {
+							src = this.graph.getNode(e.getDest()).getKey();
+							dest = this.graph.getNode(e.getSrc()).getKey();
+						}
+					} else { // if its apple
+						if (highNode > 1) {
+							src = this.graph.getNode(e.getSrc()).getKey();
+							dest = this.graph.getNode(e.getDest()).getKey();
+						} else {
+							src = this.graph.getNode(e.getDest()).getKey();
+							dest = this.graph.getNode(e.getSrc()).getKey();
+
+						}
+					}
+				}
+			}
+		}
+		this.fruits.remove(index);
+		return this.graph.getEdge(src, dest);
 	}
 
 	public void run() {
 		long first = System.currentTimeMillis();
 		while (game.isRunning()) {
 			StdDraw.enableDoubleBuffering();
-			if (StdDraw.isMousePressed()) {
-				checkClickR();
-				checkClickN();
+			if(!this.auto){
+				if (StdDraw.isMousePressed()) {
+					checkClickR();
+					checkClickN();
+				}
+				if (posR != -1 && nextNode != -1 && id != -1) {
+					manualMove(id, nextNode);
+				}
 			}
-			if (posR != -1 && nextNode != -1 && id != -1) {
-				manualMove(id, nextNode);
+			else { //auto game mode 
+				for (int j = 0; j < this.game.getRobots().size(); j++) {
+					moveRobots(this.game, this.graph, j);
+				}
+				
 			}
-
 
 			this.gui.initGUI();
 			if (System.currentTimeMillis() - first >= 1000) {
 				StdDraw.setPenColor();
 				StdDraw.setPenRadius(0.02);
-				StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.003,
+				StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.002,
 						"time to end : " + this.game.timeToEnd() / 1000);
 				StdDraw.setPenRadius();
 			}

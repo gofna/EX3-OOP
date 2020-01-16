@@ -35,8 +35,8 @@ public class Graph_GUI implements Runnable {
 		StdDraw.clear();
 		Rx = findRangeX();
         Ry = findRangeY();
-        StdDraw.setXscale(Rx.get_min()-0.004,Rx.get_max()+0.004);
-        StdDraw.setYscale(Ry.get_min()-0.004,Ry.get_max()+0.004);
+        StdDraw.setXscale(Rx.get_min()-0.003,Rx.get_max()+0.003);
+        StdDraw.setYscale(Ry.get_min()-0.003,Ry.get_max()+0.003);
 
 		if (this.g != null) {
 			for (node_data n : this.g.getV()) {

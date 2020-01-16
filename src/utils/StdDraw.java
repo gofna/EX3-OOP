@@ -1726,22 +1726,24 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	 */
 
 	public static MyGameGUI game;
-	public static autoGame autogame;
+	//public static autoGame autogame;
 
 	public void actionPerformed(ActionEvent e) {
 		String str = e.getActionCommand();
 		if (str.equals("start manual game")) {
 			StdDraw.clear();
 			game = new MyGameGUI();
+			this.game.auto = false;
 			// this.game.getGame().stopGame();
 			game.placeRobot();
 
 		}
 		if (str.equals("start automatic game")) {
 			// this.autogame = new autoGame(this.game.senario);
-			// game = new MyGameGUI();
-
-			autoGame auto = new autoGame();
+			 game = new MyGameGUI();
+			 this.game.auto = true;
+			this.game.start();
+			//autoGame auto = new autoGame();
 
 
 		}
