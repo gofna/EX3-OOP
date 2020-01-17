@@ -1731,7 +1731,8 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	public void actionPerformed(ActionEvent e) {
 		String str = e.getActionCommand();
 		if (str.equals("start manual game")) {
-			StdDraw.clear();
+				StdDraw.clear();
+			
 			game = new MyGameGUI();
 			this.game.auto = false;
 			// this.game.getGame().stopGame();
