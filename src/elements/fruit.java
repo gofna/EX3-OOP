@@ -19,10 +19,10 @@ public class fruit {
             this.type = fruit.getInt("type");
             this.setValue(fruit.getDouble("value"));
             if(this.type== -1) {
-            	this.image = "banana.PNG";
+            	this.image = "data/banana.PNG";
             }
             else {
-            	this.image = "apple.jpg";
+            	this.image = "data/apple.PNG";
             }
         }catch (Exception e){
         	e.printStackTrace();}

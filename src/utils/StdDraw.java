@@ -78,6 +78,7 @@ import javax.swing.KeyStroke;
 import javax.swing.plaf.FileChooserUI;
 
 import dataStructure.node_data;
+import gameClient.KML_Loger;
 import gameClient.MyGameGUI;
 import gameClient.autoGame;
 import gui.Graph_GUI;
@@ -686,6 +687,7 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		setPenRadius();
 		setFont();
 		clear();
+		picture(800, 600, "data/start game.JPG");
 
 		// add antialiasing
 		RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -719,8 +721,7 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		JMenu features = new JMenu("start"); // bottom
 		menuBar.add(file);
 		menuBar.add(features);
-		JMenuItem save = new JMenuItem(" Save...   ");
-		JMenuItem open = new JMenuItem(" Open...   ");
+		JMenuItem save = new JMenuItem(" Save as KML");
 		JMenuItem manual = new JMenuItem("start manual game");
 		JMenuItem automatic = new JMenuItem("start automatic game");
 		save.addActionListener(std);
@@ -728,15 +729,9 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		save.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-		open.addActionListener(std);
-
-		open.setAccelerator(
-				KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-
 		manual.addActionListener(std);
 		automatic.addActionListener(std);
 		file.add(save);
-		file.add(open);
 		features.add(manual);
 		features.add(automatic);
 		return menuBar;
@@ -1726,49 +1721,41 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	 */
 
 	public static MyGameGUI game;
-	//public static autoGame autogame;
 
 	public void actionPerformed(ActionEvent e) {
 		String str = e.getActionCommand();
 		if (str.equals("start manual game")) {
-				StdDraw.clear();
-			
+			StdDraw.clear();
 			game = new MyGameGUI();
 			this.game.auto = false;
-			// this.game.getGame().stopGame();
+			this.game.getGame().stopGame();
 			game.placeRobot();
 
 		}
 		if (str.equals("start automatic game")) {
-			// this.autogame = new autoGame(this.game.senario);
-			 game = new MyGameGUI();
-			 this.game.auto = true;
+			game = new MyGameGUI();
+			this.game.auto = true;
 			this.game.start();
-			//autoGame auto = new autoGame();
-
 
 		}
-//		String str = e.getActionCommand();
-//		if (str.equals(" Save...   ")) {
-//			FileDialog chooser = new FileDialog(StdDraw.frame, "Use a txt extension", FileDialog.SAVE);
-//			chooser.setVisible(true);
-//			String filename = chooser.getFile();
-//			if (filename != null) {
-//				gui.save(filename);
-//			}
-//		}
-//
-//		if (str.equals(" Open...   ")) {
-//			FileDialog chooser = new FileDialog(StdDraw.frame, "choose", FileDialog.LOAD);
-//			chooser.setVisible(true);
-//			String filename = chooser.getFile();
-//			if (filename != null) {
-//				ga.init(filename);
-//				gui.init(chooser.getDirectory() + File.separator + chooser.getFile());
-//				gui.initGUI();
-//			}
-//		}
-//
+
+		if (str.equals(" Save as KML")) {
+			try {
+				if (this.game.game.isRunning()) {
+					JFrame saved = new JFrame();
+					JOptionPane.showMessageDialog(saved, "sorry, wait to the end of the game.");
+				}
+				else {
+				KML_Loger.createKMLFile(this.game.scenario);
+				JFrame saved = new JFrame();
+				JOptionPane.showMessageDialog(saved, "your game is saved!");
+				}
+			} catch (NullPointerException e1) {
+				JFrame saved = new JFrame();
+				JOptionPane.showMessageDialog(saved, "sorry, you can save just after the game.");
+			}
+
+		}
 	}
 
 	/***************************************************************************

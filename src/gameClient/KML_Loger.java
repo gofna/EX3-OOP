@@ -1,84 +1,123 @@
 package gameClient;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
-
-import utils.Point3D;
+import java.util.StringTokenizer;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 public class KML_Loger {
-	public void createKMLFile(int senario){
-		 
+	private static ArrayList<String> content = new ArrayList<String>();
+	private static String kmlelement;
 
-        String kmlstart = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                        "<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n";
+	public static void createPlacemark(double x, double y, String element) {
+		if (x == 0 & y == 0) {
 
-        String kmlelement ="\t<Placemark>\n" +
-                            "\t<name>Simple placemark</name>\n" +
-                            "\t<description>"+senario+"</description>\n" +
-                            "\t<Point>\n" +
-                            "\t\t<coordinates>"+3+","+2+"</coordinates>\n" +
-                            "\t</Point>\n" +
-                            "\t</Placemark>\n";
+		} else {
+			kmlelement += "<Placemark>\n" + "<TimeStamp>\n" + "<when>" + time() + "</when>\n" + "</TimeStamp>\n"
+					+ "<styleUrl>#" + element + "</styleUrl>\n" + "<Point>\n" + "<coordinates>" + x + "," + y
+					+ "</coordinates>\n" + "</Point>\n" + "<TimeSpan>\n" + "<begin>" + 1 + "</begin>\n" + "<end>"
+					+ 0 + "</end>\n" + "</TimeSpan>\n" + "</Placemark>\n";
+		}
+	}
 
-        String kmlend = "</kml>";
+	private static String time() {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime now = LocalDateTime.now();
+		return dtf.format(now);
+	}
 
-        ArrayList<String> content = new ArrayList<String>();
-        //content.add(0,kmlstart);
-        //content.add(1,kmlelement);
-        //content.add(2,kmlend);
+	public static void createKMLFile(int senario) {
+		char o = '"';
 
-        String kmltest;
+		String kmlstart = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
+				+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n" + "\t<Document>\n"
+				+ "\t<name>robots</name>\n" +
+				"\t<description>" + senario + "</description>\n" + 
+				"<Style id="+o+"ski"+o+">\n" +
+				"<IconStyle>\n" +
+				"<Icon>\n" +
+				"<href>http://maps.google.com/mapfiles/kml/shapes/ski.png</href>\n" +
+				" </Icon>\n" +
+				"<hotSpot x="+o+'0'+o+ " y="+o+".5"+o+" xunits=" +o+ "fraction"+o+ " yunits="+o+"fraction"+o+"/>\n" +
+				"</IconStyle>\n" +
+				"</Style>\n"+
+				"<Style id="+o+"apple"+o+">\n" +
+				"<IconStyle>\n" +
+				"<Icon>\n" +
+				"<href>http://maps.google.com/mapfiles/kml/pal4/icon49.png</href>\n" +
+				" </Icon>\n" +
+				"<hotSpot x="+o+"32"+o+ " y="+o+"1"+o+" xunits=" +o+ "fraction"+o+ " yunits="+o+"fraction"+o+"/>\n" +
+				"</IconStyle>\n" +
+				"</Style>\n"+
+				"<Style id="+o+"banana"+o+">\n" +
+				"<IconStyle>\n" +
+				"<Icon>\n" +
+				"<href>http://maps.google.com/mapfiles/kml/pal4/icon47.png</href>\n" +
+				" </Icon>\n" +
+				"<hotSpot x="+o+"32"+o+ " y="+o+"1"+o+" xunits=" +o+ "fraction"+o+ " yunits="+o+"fraction"+o+"/>\n" +
+				"</IconStyle>\n" +
+				"</Style>\n";
 
+		String kmlend = "</Document>\n"+
+				"</kml>";
 
-        //Zum Einsetzen eines Substrings (weitere Placemark)
-        //String test = "</kml>";
-        //int index = kml.lastIndexOf(test);
+		content.add(0, kmlstart);
+		if(kmlelement != null) {
+			content.add(1, kmlelement);
+		}
+		content.add(2, kmlend);
 
-        File test = new File(datapath+"/"+name+".kml");
-        Writer fwriter;
+		String kmltest;
 
-        if(test.exists() == false){
-            try {
-                content.add(0,kmlstart);
-                content.add(1,kmlelement);
-                content.add(2,kmlend);
-                kmltest = content.get(0) + content.get(1) + content.get(2);
+		// Zum Einsetzen eines Substrings (weitere Placemark)
+		// String test = "</kml>";
+		// int index = kml.lastIndexOf(test);
 
-                fwriter = new FileWriter(datapath+"/"+name+".kml");
-                fwriter.write(kmltest);
-                //fwriter.append("HalloHallo", index, kml.length());
-                fwriter.flush();
-                fwriter.close();
-            }catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }   
-        }
-        else{
-            kmltest = content.get(0) + content.get(1) + content.get(2);
-            StringTokenizer tokenize = new StringTokenizer(kmltest, ">");
-            ArrayList<String> append = new ArrayList<String>();
-            while(tokenize.hasMoreTokens()){
+		File test = new File("" + String.valueOf(senario) + ".kml");
+		Writer fwriter;
 
-            append.add(tokenize.nextToken());
-            append.add(1, kmlelement);
+		if (test.exists() == false) {
+			try {
+				content.add(0, kmlstart);
+				content.add(1, kmlelement);
+				content.add(2, kmlend);
 
-            String rewrite = append.toString();
-            try {
-                fwriter = new FileWriter(datapath+"/"+name+".kml");
-                fwriter.write(rewrite);
-                fwriter.flush();
-                fwriter.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+				kmltest = content.get(0) + content.get(1) + content.get(2);
 
+				fwriter = new FileWriter("KML_games/" + String.valueOf(senario) + ".kml");
+				fwriter.write(kmltest);
+				fwriter.flush();
+				fwriter.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		} else {
+			kmltest = content.get(0) + content.get(1) + content.get(2);
+			StringTokenizer tokenize = new StringTokenizer(kmltest, ">");
+			ArrayList<String> append = new ArrayList<String>();
+			while (tokenize.hasMoreTokens()) {
 
-            }
+				append.add(tokenize.nextToken());
 
-        }
+				String rewrite = append.toString();
+				try {
+					fwriter = new FileWriter("" + String.valueOf(senario) + ".kml");
+					fwriter.write(rewrite);
+					fwriter.flush();
+					fwriter.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
+			}
 
+		}
 
-    }
+	}
+
 }

@@ -12,18 +12,36 @@ import dataStructure.DGraph;
 import dataStructure.edge_data;
 import dataStructure.node_data;
 import elements.fruit;
+import utils.Point3D;
 
+/**
+ * this class represent a automatic game.
+ * the class allowing an effective automatic game ,
+ *  by move the robots to an edges on the graph with a fruit, in shortest path.
+ * 
+ * @author Gofna Ivry and Maor Ovadia
+ *
+ */
 public class autoGame {
 	public static game_service game;
 	private static DGraph graph;
 	private static Graph_Algo ga;
 
+	/**
+	 * the main function , to move the robot with the server to the next edge in shortest path.
+	 * the moves and the time left is printing.
+	 * @param game the game from the server
+	 * @param gg the graph of the game
+	 * @param fruits the current fruits in the game
+	 * @param ind the robot id to move to the next node.
+	 */
 	public static void moveRobots(game_service game, DGraph gg, List<fruit> fruits, int ind) {
 		autoGame.game = game;
 		graph = new DGraph();
 		graph.init(game.getGraph());
 		autoGame.ga = new Graph_Algo(graph);
 		List<String> log = game.move();
+		Point3D p;
 		if (log != null) {
 			long time = game.timeToEnd();
 			for (int i = 0; i < log.size(); i++) {
@@ -31,6 +49,8 @@ public class autoGame {
 				try {
 					JSONObject line = new JSONObject(robot_json);
 					JSONObject ttt = line.getJSONObject("Robot");
+					String pos = ttt.getString("pos");
+					p = new Point3D(pos);
 					int src = ttt.getInt("src");
 					int dest = ttt.getInt("dest");
 					if (dest == -1) {
@@ -44,7 +64,6 @@ public class autoGame {
 								dest = n.getKey();
 								game.chooseNextEdge(ind, dest);
 							}
-							// dest = nextNode(gg, src);
 							dest = e.getDest();
 							game.chooseNextEdge(ind, e.getDest());
 						}
@@ -59,6 +78,14 @@ public class autoGame {
 		}
 
 	}
+	
+	/**
+	 * this function find the closet edge with a  in shortest path by using 
+	 * "shortest path" algorithm from the class "graph_algo"and return this edge. 
+	 * @param robotPos the current position of the robot
+	 * @param fruits the list of the current fruits
+	 * @return the closest edge with a fruit.
+	 */
 
 	private static edge_data nextEdge(int robotPos, List<fruit> fruits) { // give the edge with the fruit with the
 																			// shortest path
@@ -84,6 +111,13 @@ public class autoGame {
 		return graph.getEdge(bestSrc, bestDest);
 	}
 
+	/**
+	 * this function find an edge with a given fruit, by compare the adding distance from 2 nodes to the fruit, and the distance between the 2 nodes.
+	 * the function return the right edge considering the type of the fruit (banana for down , apple for up edge).
+	 * @param graph the graph of the game
+	 * @param fr the current fruit on the game to check
+	 * @return the edge with the given fruit.
+	 */
 	public static edge_data findEdgeFruit(DGraph graph, fruit fr) {
 		int src = 0;
 		int dest = 0;
