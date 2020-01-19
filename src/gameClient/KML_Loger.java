@@ -9,10 +9,23 @@ import java.util.StringTokenizer;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * this class create a KML file to the automatic game from the class "MyGameGui". 
+ * the name of the file will be the scenario number of the game, and the file will save in a folder call "KML_games".
+ * 
+ * @author Gofna Ivry and Maor Ovadia
+ */
 public class KML_Loger {
 	private static ArrayList<String> content = new ArrayList<String>();
 	private static String kmlelement;
 
+	/**
+	 * this function get a position point on the graph and the element to document (robot, banana or apple)
+	 * and add the string to copy this strings to the KML file
+	 * @param x the x position
+	 * @param y the y position
+	 * @param element the element to document in the file(robot, banana or apple).
+	 */
 	public static void createPlacemark(double x, double y, String element) {
 		if (x == 0 & y == 0) {
 
@@ -24,19 +37,30 @@ public class KML_Loger {
 		}
 	}
 
+	/**
+	 * the function return the present time in specific format.
+	 * @return the string of the present time.
+	 */
 	private static String time() {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime now = LocalDateTime.now();
 		return dtf.format(now);
 	}
+	
+	/**
+	 * this function create the KML file with name of the scenario game. 
+	 * the function add the start of the file, and all the elements using the string of the elements.
+	 *  the function also insert elements in existing file.
+	 * @param scenario will be the name of the file (the scenario of the game).
+	 */
 
-	public static void createKMLFile(int senario) {
+	public static void createKMLFile(int scenario) {
 		char o = '"';
 
 		String kmlstart = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 				+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\">\n" + "\t<Document>\n"
 				+ "\t<name>robots</name>\n" +
-				"\t<description>" + senario + "</description>\n" + 
+				"\t<description>" + scenario + "</description>\n" + 
 				"<Style id="+o+"ski"+o+">\n" +
 				"<IconStyle>\n" +
 				"<Icon>\n" +
@@ -73,11 +97,7 @@ public class KML_Loger {
 
 		String kmltest;
 
-		// Zum Einsetzen eines Substrings (weitere Placemark)
-		// String test = "</kml>";
-		// int index = kml.lastIndexOf(test);
-
-		File test = new File("" + String.valueOf(senario) + ".kml");
+		File test = new File("data/" + String.valueOf(scenario) + ".kml");
 		Writer fwriter;
 
 		if (test.exists() == false) {
@@ -88,7 +108,7 @@ public class KML_Loger {
 
 				kmltest = content.get(0) + content.get(1) + content.get(2);
 
-				fwriter = new FileWriter("KML_games/" + String.valueOf(senario) + ".kml");
+				fwriter = new FileWriter("data/" + String.valueOf(scenario) + ".kml");
 				fwriter.write(kmltest);
 				fwriter.flush();
 				fwriter.close();
@@ -106,7 +126,7 @@ public class KML_Loger {
 
 				String rewrite = append.toString();
 				try {
-					fwriter = new FileWriter("" + String.valueOf(senario) + ".kml");
+					fwriter = new FileWriter("data/" + String.valueOf(scenario) + ".kml");
 					fwriter.write(rewrite);
 					fwriter.flush();
 					fwriter.close();

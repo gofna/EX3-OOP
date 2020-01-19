@@ -11,12 +11,28 @@ import dataStructure.node_data;
 import utils.Range;
 import utils.StdDraw;
 
+/**
+ * this class display a graph on a window. to show the graph optimally, the
+ * class make all the adjustments such as: - change the scales window according
+ * to the vertices value and edges on the graph. - put an image in size that
+ * fits the window.
+ * 
+ * @author Maor Ovadia and Gofna Ivry.
+ *
+ */
 public class Graph_GUI implements Runnable {
 
 	private graph g = new DGraph();
 	private int count;
 	private static Range Rx = new Range(0, 0);
 	private static Range Ry = new Range(0, 0);
+
+	/**
+	 * constructor function , to initialize the graph to draw on the GUI window and
+	 * to choose the size of the window.
+	 * 
+	 * @param g the graph to draw.
+	 */
 
 	public Graph_GUI(graph g) {
 		this.g = g;
@@ -30,14 +46,18 @@ public class Graph_GUI implements Runnable {
 
 	}
 
+	/**
+	 * this function draw the graph on the window using StdDrow , drawing the nodes,
+	 * the nodes number, the edges and the directions of the edges(by green points).
+	 */
 	public void initGUI() {
 		StdDraw.clear();
-		
+
 		Rx = findRangeX();
 		Ry = findRangeY();
 		StdDraw.setXscale(Rx.get_min() - 0.003, Rx.get_max() + 0.003);
 		StdDraw.setYscale(Ry.get_min() - 0.003, Ry.get_max() + 0.003);
-		StdDraw.picture(Rx.get_min()+0.012,Ry.get_min()+0.003, "data/game background.PNG");
+		StdDraw.picture(Rx.get_min() + 0.012, Ry.get_min() + 0.003, "data/game background.PNG");
 		if (this.g != null) {
 			for (node_data n : this.g.getV()) {
 				StdDraw.setPenColor(Color.BLUE);
@@ -67,7 +87,6 @@ public class Graph_GUI implements Runnable {
 
 	}
 
-
 	public void run() {
 		try {
 			while (true) {
@@ -82,6 +101,11 @@ public class Graph_GUI implements Runnable {
 
 	}
 
+	/**
+	 * this function find the range of the X scale, by finding the minimum x position of node, 
+	 * and maximum x position of node
+	 * @return the range of the nodes.
+	 */
 	public Range findRangeX() {
 		if (g.nodeSize() != 0) {
 			double min = Integer.MAX_VALUE;
@@ -103,6 +127,11 @@ public class Graph_GUI implements Runnable {
 		}
 	}
 
+	/**
+	 * this function find the range of the y scale, by finding the minimum y position of node, 
+	 * and maximum y position of node
+	 * @return the range of the nodes.
+	 */
 	public Range findRangeY() {
 		if (g.nodeSize() != 0) {
 			double min = Integer.MAX_VALUE;
