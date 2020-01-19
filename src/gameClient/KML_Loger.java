@@ -97,7 +97,7 @@ public class KML_Loger {
 
 		String kmltest;
 
-		File test = new File("data/" + String.valueOf(scenario) + ".kml");
+		File test = new File("" + String.valueOf(scenario) + ".kml");
 		Writer fwriter;
 
 		if (test.exists() == false) {

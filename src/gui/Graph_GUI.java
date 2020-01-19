@@ -14,7 +14,7 @@ import utils.StdDraw;
 /**
  * this class display a graph on a window. to show the graph optimally, the
  * class make all the adjustments such as: - change the scales window according
- * to the vertices value and edges on the graph. - put an image in size that
+ * to the vertices value and edges on the graph. -put an image in size that
  * fits the window.
  * 
  * @author Maor Ovadia and Gofna Ivry.
