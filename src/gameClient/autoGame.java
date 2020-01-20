@@ -1,6 +1,7 @@
 package gameClient;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONException;
@@ -26,6 +27,7 @@ public class autoGame {
 	public static game_service game;
 	private static DGraph graph;
 	private static Graph_Algo ga;
+	static List<fruit> fruits = new LinkedList<fruit>();
 
 	/**
 	 * the main function , to move the robot with the server to the next edge in shortest path.
@@ -35,13 +37,14 @@ public class autoGame {
 	 * @param fruits the current fruits in the game
 	 * @param ind the robot id to move to the next node.
 	 */
-	public static void moveRobots(game_service game, DGraph gg, List<fruit> fruits, int ind) {
+	public static void moveRobots(game_service game, DGraph gg, List<fruit> fruits) {
+		autoGame.fruits = fruits;
 		autoGame.game = game;
 		graph = new DGraph();
 		graph.init(game.getGraph());
 		autoGame.ga = new Graph_Algo(graph);
-		List<String> log = game.move();
 		Point3D p;
+		List<String> log = game.move();
 		if (log != null) {
 			long time = game.timeToEnd();
 			for (int i = 0; i < log.size(); i++) {
@@ -51,21 +54,22 @@ public class autoGame {
 					JSONObject ttt = line.getJSONObject("Robot");
 					String pos = ttt.getString("pos");
 					p = new Point3D(pos);
+					int rid = ttt.getInt("id");
 					int src = ttt.getInt("src");
 					int dest = ttt.getInt("dest");
 					if (dest == -1) {
-						edge_data e = nextEdge(src, fruits);
+						edge_data e = nextEdge(src, autoGame.fruits);
 						List<node_data> nodes = ga.shortestPath(src, e.getSrc());
 						if (nodes == null) {
 							dest = e.getDest();
-							game.chooseNextEdge(ind, e.getDest());
+							game.chooseNextEdge(rid, e.getDest());
 						} else {
 							for (node_data n : nodes) {
 								dest = n.getKey();
-								game.chooseNextEdge(ind, dest);
+								game.chooseNextEdge(rid, dest);
 							}
 							dest = e.getDest();
-							game.chooseNextEdge(ind, e.getDest());
+							game.chooseNextEdge(rid, e.getDest());
 						}
 						System.out.println("Turn to node: " + dest + "  time to end:" + (time / 1000));
 						System.out.println(ttt);
@@ -87,27 +91,23 @@ public class autoGame {
 	 * @return the closest edge with a fruit.
 	 */
 
-	private static edge_data nextEdge(int robotPos, List<fruit> fruits) { // give the edge with the fruit with the
-																			// shortest path
-		if (fruits.isEmpty()) {
-			Iterator<String> f_iter = game.getFruits().iterator();
-			while (f_iter.hasNext()) {
-				fruit f = new fruit(f_iter.next().toString());
-				fruits.add(f);
-			}
-		}
+	private static edge_data nextEdge(int robotPos, List<fruit> fruits) { // give the edge with the fruit with the	shortest path.
 		double minPath = Double.POSITIVE_INFINITY;
 		int bestSrc = robotPos;
 		int bestDest = robotPos;
+		double temp = -1;
+		int indF = -1;
 		for (int i = 0; i < fruits.size(); i++) {
 			edge_data e = findEdgeFruit(graph, fruits.get(i));
-			fruits.remove(i);
-			if (ga.shortestPathDist(robotPos, e.getSrc()) < minPath) {
-				minPath = ga.shortestPathDist(robotPos, e.getSrc());
+			temp = ga.shortestPathDist(robotPos, e.getSrc());
+			if ( temp < minPath) {
+				minPath = temp;
 				bestSrc = e.getSrc();
 				bestDest = e.getDest();
+				indF = i;
 			}
 		}
+		autoGame.fruits.remove(indF);
 		return graph.getEdge(bestSrc, bestDest);
 	}
 

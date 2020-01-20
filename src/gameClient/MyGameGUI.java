@@ -1,6 +1,9 @@
 package gameClient;
 
 import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +40,7 @@ public class MyGameGUI implements Runnable {
 	private DGraph graph;
 	private Graph_GUI gui;
 	private Graph_Algo ga;
-	List<fruit> fruits = new LinkedList<fruit>();
+	static List<fruit> fruits = new LinkedList<fruit>();
 	public game_service game;
 	public int scenario;
 	private int numOfRobots;
@@ -50,6 +53,7 @@ public class MyGameGUI implements Runnable {
 
 	public MyGameGUI() {
 		chooseScenario();
+		Game_Server.login(208888875);
 		this.game = Game_Server.getServer(this.scenario); // you have [0,23] games
 		StdDraw.game = this;
 		String g = game.getGraph();
@@ -219,11 +223,11 @@ public class MyGameGUI implements Runnable {
 	 * fruits by the robots.
 	 */
 	private void drawFruits() {
-		this.fruits.clear();
+		MyGameGUI.fruits.clear();
 		Iterator<String> fruits = game.getFruits().iterator();
 		while (fruits.hasNext()) {
 			fruit fr = new fruit(fruits.next());
-			this.fruits.add(fr); // add to fruit list
+			MyGameGUI.fruits.add(fr); // add to fruit list
 			StdDraw.picture(fr.getLocation().x(), fr.getLocation().y(), fr.getImage(), 0.001, 0.0007);
 			if (fr != null) {
 				if (fr.getType() == -1) {
@@ -235,22 +239,6 @@ public class MyGameGUI implements Runnable {
 		}
 	}
 
-	/**
-	 * the function show the score of the game on the screen by using the server to
-	 * get the score. displaying the score on the window game by using stdDraw.
-	 */
-	private void showScore() {
-		try {
-			String info = game.toString();
-			JSONObject line = new JSONObject(info);
-			JSONObject ttt = line.getJSONObject("GameServer");
-			int score = ttt.getInt("grade");
-			StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.0015, "score : " + score);
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-	}
 
 	/**
 	 * this function start a automatic game if the user choose the automatic option.
@@ -259,6 +247,13 @@ public class MyGameGUI implements Runnable {
 	 * the window game by using stdDraw. after-start the game and the thread.
 	 */
 	public void start() {
+		if (fruits.isEmpty()) {
+			Iterator<String> f_iter = game.getFruits().iterator();
+			while (f_iter.hasNext()) {
+				fruit f = new fruit(f_iter.next().toString());
+				fruits.add(f);
+			}
+		}
 		node_data n = this.graph.getNode(0);
 		for (int a = 0; a < this.numOfRobots; a++) { // put the robot in start position
 			n = this.graph.getNode(findFirstPos().getSrc());
@@ -287,10 +282,10 @@ public class MyGameGUI implements Runnable {
 		int i;
 		int index = 0;
 		edge_data e = this.graph.getEdge(0, 1);
-		for (i = 0; i < this.fruits.size(); i++) { // find the fruit with the best value
-			if (this.fruits.get(i).getValue() > maxVal) {
-				maxVal = this.fruits.get(i).getValue();
-				maxF = this.fruits.get(i);
+		for (i = 0; i < MyGameGUI.fruits.size(); i++) { // find the fruit with the best value
+			if (MyGameGUI.fruits.get(i).getValue() > maxVal) {
+				maxVal = MyGameGUI.fruits.get(i).getValue();
+				maxF = MyGameGUI.fruits.get(i);
 				index = i;
 			}
 		}
@@ -300,17 +295,12 @@ public class MyGameGUI implements Runnable {
 	}
 
 	public void run() {
-
 		long first = System.currentTimeMillis();
 		while (game.isRunning()) {
 			StdDraw.enableDoubleBuffering();
 			this.gui.initGUI();
 			if (System.currentTimeMillis() - first >= 1000) {
-				StdDraw.setPenColor(Color.WHITE);
-				StdDraw.setPenRadius(0.02);
-				StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.002,
-						"time to end : " + this.game.timeToEnd() / 1000);
-				StdDraw.setPenRadius();
+				showTime();
 			}
 			showScore();
 			if (!this.auto) {
@@ -323,18 +313,73 @@ public class MyGameGUI implements Runnable {
 
 				}
 			} else { // auto game mode
-				for (int j = 0; j < numOfRobots; j++) {
-					autoGame.moveRobots(this.game, this.graph, fruits, j);
+				long dt = 95;
+				int jj = 0;
+				insertFruits();
+//				for (int j = 0; j < numOfRobots; j++) {
+					autoGame.moveRobots(this.game, this.graph, fruits);
+					try {
+						List<String> stat = game.getRobots();
+						for (int i = 0; i < stat.size(); i++) {
+							System.out.println(jj + ") " + stat.get(i));
+						}
+						Thread.sleep(dt);
+						jj++;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
-
-			}
+				MyGameGUI.fruits.clear();
+//			}
 			drawRobot();
 			drawFruits();
 			StdDraw.show();
 
 		}
 		String results = this.game.toString();
+		BufferedReader objReader =null;
+		try {
+			objReader = new BufferedReader(new FileReader("data/"+ this.scenario + ".kml"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		String remark = objReader.toString();
+		game.sendKML(remark);
 		System.out.println("Game Over: " + results);
+	}
+
+	private void showTime() {
+		StdDraw.setPenColor(Color.WHITE);
+		StdDraw.setPenRadius(0.02);
+		StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.002,
+				"time to end : " + this.game.timeToEnd() / 1000);
+		StdDraw.setPenRadius();
+	}
+	
+	/**
+	 * the function show the score of the game on the screen by using the server to
+	 * get the score. displaying the score on the window game by using stdDraw.
+	 */
+	private void showScore() {
+		try {
+			String info = game.toString();
+			JSONObject line = new JSONObject(info);
+			JSONObject ttt = line.getJSONObject("GameServer");
+			int score = ttt.getInt("grade");
+			StdDraw.text(this.gui.findRangeX().get_max(), this.gui.findRangeY().get_max() + 0.0015, "score : " + score);
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void insertFruits() {
+		Iterator<String> f_iter = game.getFruits().iterator();
+		while (f_iter.hasNext()) {
+			fruit f = new fruit(f_iter.next().toString());
+			fruits.add(f);
+		}
+		
 	}
 
 	/*
@@ -346,6 +391,7 @@ public class MyGameGUI implements Runnable {
 
 	/**
 	 * this function to set the game.
+	 * 
 	 * @param game the gem to set.
 	 */
 	public void setGame(game_service game) {
