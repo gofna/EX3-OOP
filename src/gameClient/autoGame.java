@@ -24,7 +24,7 @@ import utils.Point3D;
  *
  */
 public class autoGame {
-	public static game_service game;
+//	public static game_service game;
 	private static DGraph graph;
 	private static Graph_Algo ga;
 	static List<fruit> fruits = new LinkedList<fruit>();
@@ -37,9 +37,8 @@ public class autoGame {
 	 * @param fruits the current fruits in the game
 	 * @param ind the robot id to move to the next node.
 	 */
-	public static void moveRobots(game_service game, DGraph gg, List<fruit> fruits) {
+	public static game_service moveRobots(game_service game, DGraph gg, List<fruit> fruits) {
 		autoGame.fruits = fruits;
-		autoGame.game = game;
 		graph = new DGraph();
 		graph.init(game.getGraph());
 		autoGame.ga = new Graph_Algo(graph);
@@ -67,6 +66,7 @@ public class autoGame {
 							for (node_data n : nodes) {
 								dest = n.getKey();
 								game.chooseNextEdge(rid, dest);
+								System.out.println("Turn to node: " + dest + "  time to end:" + (time / 1000));
 							}
 							dest = e.getDest();
 							game.chooseNextEdge(rid, e.getDest());
@@ -80,7 +80,7 @@ public class autoGame {
 				}
 			}
 		}
-
+		return game;
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class autoGame {
 				indF = i;
 			}
 		}
-		autoGame.fruits.remove(indF);
+	//	autoGame.fruits.remove(indF);
 		return graph.getEdge(bestSrc, bestDest);
 	}
 

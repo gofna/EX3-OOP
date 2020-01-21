@@ -81,6 +81,7 @@ import dataStructure.node_data;
 import gameClient.KML_Loger;
 import gameClient.MyGameGUI;
 import gameClient.autoGame;
+import gameClient.recordsTable;
 import gui.Graph_GUI;
 
 /**
@@ -631,7 +632,7 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	// singleton pattern: client can't instantiate
 
 	public static Graph_GUI gui;
-//	public static Graph_Algo ga = new Graph_Algo();
+	//	public static Graph_Algo ga = new Graph_Algo();
 
 	private StdDraw() {
 	}
@@ -719,11 +720,17 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		JMenuBar menuBar = new JMenuBar(); // create menu bar
 		JMenu file = new JMenu("File"); // Bottom
 		JMenu features = new JMenu("start"); // bottom
+		JMenu records = new JMenu("records"); 
 		menuBar.add(file);
 		menuBar.add(features);
+		menuBar.add(records);
 		JMenuItem save = new JMenuItem(" Save as KML");
 		JMenuItem manual = new JMenuItem("start manual game");
 		JMenuItem automatic = new JMenuItem("start automatic game");
+		JMenuItem r1 = new JMenuItem(" number of my games ");
+		JMenuItem r2 = new JMenuItem(" my max level");
+		JMenuItem r3 = new JMenuItem(" my records");
+		JMenuItem r4 = new JMenuItem(" my position");	
 		save.addActionListener(std);
 
 		save.setAccelerator(
@@ -731,9 +738,17 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 
 		manual.addActionListener(std);
 		automatic.addActionListener(std);
+		r1.addActionListener(std);
+		r2.addActionListener(std);
+		r3.addActionListener(std);
+		r4.addActionListener(std);
 		file.add(save);
 		features.add(manual);
 		features.add(automatic);
+		records.add(r1);
+		records.add(r2);
+		records.add(r3);
+		records.add(r4);
 		return menuBar;
 	}
 
@@ -1746,9 +1761,9 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 					JOptionPane.showMessageDialog(saved, "sorry, wait to the end of the game.");
 				}
 				else {
-				KML_Loger.createKMLFile(this.game.scenario);
-				JFrame saved = new JFrame();
-				JOptionPane.showMessageDialog(saved, "your game is saved!");
+					KML_Loger.createKMLFile(this.game.scenario);
+					JFrame saved = new JFrame();
+					JOptionPane.showMessageDialog(saved, "your game is saved!");
 				}
 			} catch (NullPointerException e1) {
 				JFrame saved = new JFrame();
@@ -1756,6 +1771,41 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 			}
 
 		}
+
+
+		if (str.equals(" number of my games ")) {
+			JFrame games = new JFrame();
+			JOptionPane.showMessageDialog(games, "you played : "+ recordsTable.showMe() + " times!");
+		}
+
+		if (str.equals(" my max level")) {
+			JFrame level = new JFrame();
+			JOptionPane.showMessageDialog(level, "you'r maximum level is "+ recordsTable.showMaxLevel("208888875"));
+		}
+
+		if (str.equals(" my records")) {
+			double[] arr = recordsTable.topScores("208888875");
+			JFrame top = new JFrame();
+			JOptionPane.showMessageDialog(top, "you'r records : \n" 
+					+"in level 0    " + arr[0] + "\n"
+					+"in level 1    " + arr[1] + "\n"
+					+"in level 3    " + arr[3] + "\n"
+					+"in level 5    " + arr[5] + "\n"
+					+"in level 9    " + arr[9] + "\n"
+					+"in level 11   " + arr[11] + "\n"
+					+"in level 13   " + arr[13] + "\n"
+					+"in level 16   " + arr[16] + "\n"
+					+"in level 19   " + arr[19] + "\n"
+					+"in level 20   " + arr[20] + "\n"
+					+"in level 23   " + arr[23]);
+																							;
+
+		}
+		
+		if (str.equals(" my position")) {
+
+		}
+
 	}
 
 	/***************************************************************************
@@ -1812,10 +1862,10 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	 * This method cannot be called directly.
 	 */
 	public void mouseClicked(MouseEvent e) {
-//		StdDraw.enableDoubleBuffering();
-//		this.game.checkClickR();
-//		this.game.checkClickN();
-//		StdDraw.show();
+		//		StdDraw.enableDoubleBuffering();
+		//		this.game.checkClickR();
+		//		this.game.checkClickN();
+		//		StdDraw.show();
 	}
 
 	/**

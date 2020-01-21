@@ -26,11 +26,40 @@ public class SimpleDB {
 	public static void main(String[] args) {
 		int id1 = 208888875; // "dummy existing ID
 		int level = 0;
-		allUsers();
-		printLog();
+//		allUsers();
+//		printLog();
+		showMe();
 		String kml = getKML(id1, level);
-		System.out.println("data/" + level+".kml");
+	//	System.out.println("data/" + level+".kml");
 		System.out.println(kml);
+		
+	}
+	
+	public static void showMe() {
+		String CustomersQuery = "SELECT * FROM Logs where userID=208888875";
+		int count = 0;
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(CustomersQuery);
+			while (resultSet.next()) {
+				System.out.println("Id: " + resultSet.getInt("UserID") + "," + resultSet.getInt("levelID") + ","+
+						resultSet.getDouble("score")+ "," + resultSet.getInt("moves") + ","+resultSet.getInt("logID")+ ","  + resultSet.getDate("time"));
+				count++;
+			}
+			System.out.println("you played : "+ count + " Times");
+			resultSet.close();
+			statement.close();
+			connection.close();
+		} catch (SQLException sqle) {
+			System.out.println("SQLException: " + sqle.getMessage());
+			System.out.println("Vendor Error: " + sqle.getErrorCode());
+		}
+
+		catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -46,8 +75,8 @@ public class SimpleDB {
 			ResultSet resultSet = statement.executeQuery(allCustomersQuery);
 
 			while (resultSet.next()) {
-				System.out.println("Id: " + resultSet.getInt("UserID") + "," + resultSet.getInt("levelID") + ","
-						+ resultSet.getInt("moves") + "," + resultSet.getDate("time"));
+				System.out.println("Id: " + resultSet.getInt("UserID") + "," + resultSet.getInt("levelID") + ","+
+						resultSet.getDouble("score")+ "," + resultSet.getInt("moves") + ","+resultSet.getInt("logID")+ ","  + resultSet.getDate("time"));
 			}
 			resultSet.close();
 			statement.close();

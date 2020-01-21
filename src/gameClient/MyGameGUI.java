@@ -282,6 +282,9 @@ public class MyGameGUI implements Runnable {
 		int i;
 		int index = 0;
 		edge_data e = this.graph.getEdge(0, 1);
+//		if( this.numOfRobots > 1) {
+//			
+//		}
 		for (i = 0; i < MyGameGUI.fruits.size(); i++) { // find the fruit with the best value
 			if (MyGameGUI.fruits.get(i).getValue() > maxVal) {
 				maxVal = MyGameGUI.fruits.get(i).getValue();
@@ -293,6 +296,8 @@ public class MyGameGUI implements Runnable {
 		fruits.remove(index);
 		return e;
 	}
+
+	int jj = 0;
 
 	public void run() {
 		long first = System.currentTimeMillis();
@@ -313,11 +318,10 @@ public class MyGameGUI implements Runnable {
 
 				}
 			} else { // auto game mode
-				long dt = 95;
-				int jj = 0;
+				long dt = 100;
 				insertFruits();
 //				for (int j = 0; j < numOfRobots; j++) {
-					autoGame.moveRobots(this.game, this.graph, fruits);
+					this.game = autoGame.moveRobots(this.game, this.graph, fruits);
 					try {
 						List<String> stat = game.getRobots();
 						for (int i = 0; i < stat.size(); i++) {
@@ -329,8 +333,7 @@ public class MyGameGUI implements Runnable {
 						e.printStackTrace();
 					}
 				}
-				MyGameGUI.fruits.clear();
-//			}
+			//			}
 			drawRobot();
 			drawFruits();
 			StdDraw.show();
@@ -374,6 +377,7 @@ public class MyGameGUI implements Runnable {
 	}
 
 	private void insertFruits() {
+		MyGameGUI.fruits.clear();
 		Iterator<String> f_iter = game.getFruits().iterator();
 		while (f_iter.hasNext()) {
 			fruit f = new fruit(f_iter.next().toString());
