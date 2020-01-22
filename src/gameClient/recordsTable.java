@@ -11,10 +11,15 @@ import java.util.HashMap;
 import utils.StdDraw;
 
 /**
- * This class represents a simple example of using MySQL Data-Base. Use this
- * example for writing solution.
+ * This class used to allow retrieval from MySQL Data-Base information such as-
+ * 1. how many times did you play 
+ * 2. you'r maximum open level 
+ * 3. the best score
+ * each level 
+ * 4. you'r position in each level in relation to others in the
+ * data-base.
  * 
- * @author boaz.benmoshe
+ * @author Gofna Ivry and Maor Ovadia
  *
  */
 public class recordsTable {
@@ -23,42 +28,28 @@ public class recordsTable {
 	public static final String jdbcUserPassword = "OOP2020student";
 	public static MyGameGUI mygame;
 	private static HashMap<Integer, Integer> maxMoves = new HashMap<Integer, Integer>();
+
 	/**
-	 * Simple main for demonstrating the use of the Data-base
+	 * this function return the top scores according to given id, in each level.
 	 * 
-	 * @param args
+	 * @param id the id to check.
+	 * @return array with the best scores in each level.
 	 */
-	public static void main(String[] args) {
-//		int id1 = 208888875; // "dummy existing ID
-//		int level = 0;
-////		allUsers();
-////		printLog();
-//		times();
-//		showMyPos(0);
-////		topScores("208888875");
-//		showMaxLevel("208888875");
-//		// String kml = getKML(id1, level);
-//		// System.out.println("data/" + level+".kml");
-//		// System.out.println(kml);
-
-	}
-
 	public static double[] topScores(String id) {
 		recordsTable.insertMap();
 		double[] arr = new double[24];
 		for (int i = 0; i <= showMaxLevel(id); i++) {
 			double max = -1;
-			String CustomersQuery = ("SELECT MAX(score) FROM Logs where userID="+id + " AND levelID=" + i);
+			String CustomersQuery = ("SELECT MAX(score) FROM Logs where userID=" + id + " AND levelID=" + i);
 			try {
 				Class.forName("com.mysql.jdbc.Driver");
 				Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(CustomersQuery);
-				while (resultSet.next()) {
-						max = resultSet.getDouble("MAX(score)");
-						System.out.println("the max score in level " + i + " is " +max);
-						arr[i] = max;
-				}
+				resultSet.next();
+				max = resultSet.getDouble("MAX(score)");
+				System.out.println("the max score in level " + i + " is " + max);
+				arr[i] = max;
 				resultSet.close();
 				statement.close();
 				connection.close();
@@ -75,19 +66,23 @@ public class recordsTable {
 		return arr;
 	}
 
+	/**
+	 * the function pull the maximum level that open in the server to a given id.
+	 * 
+	 * @param id the id to check.
+	 * @return the maximum level that open in the server.
+	 */
+
 	public static int showMaxLevel(String id) {
 		int maxLevel = -1;
-		String CustomersQuery = "SELECT * FROM Logs where userId=" + id;
+		String CustomersQuery = "SELECT MAX(levelID) FROM Logs where userId=" + id;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(CustomersQuery);
-			while (resultSet.next()) {
-				if (resultSet.getInt("levelID") > maxLevel) {
-					maxLevel = resultSet.getInt("levelID");
-				}
-			}
+			resultSet.next();
+			maxLevel = resultSet.getInt("MAX(levelID)");
 			resultSet.close();
 			statement.close();
 			connection.close();
@@ -102,20 +97,22 @@ public class recordsTable {
 		return maxLevel;
 	}
 
+	/**
+	 * this function pull the numbers of games that a given id played.
+	 * 
+	 * @param id the id to check.
+	 * @return number of times that the user played.
+	 */
 	public static int times(String id) {
-		String CustomersQuery = "SELECT * FROM Logs where userID="+id;
+		String CustomersQuery = "SELECT COUNT(userID) FROM Logs where userID=" + id;
 		int count = 0;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(CustomersQuery);
-			while (resultSet.next()) {
-//				System.out.println("Id: " + resultSet.getInt("UserID") + "," + resultSet.getInt("levelID") + ","+
-//						resultSet.getDouble("score")+ "," + resultSet.getInt("moves") + ","+resultSet.getInt("logID")+ ","  + resultSet.getDate("time"));
-
-				count++;
-			}
+			resultSet.next();
+			count = resultSet.getInt("COUNT(userID)");
 			System.out.println("you played : " + count + " Times");
 			resultSet.close();
 			statement.close();
@@ -131,7 +128,15 @@ public class recordsTable {
 		return count;
 	}
 
-	public static int showMyPos(int scenario , String id) {
+	/**
+	 * the function return the position of an given id, in order to the scores in a
+	 * given level.
+	 * 
+	 * @param scenario the level to check position
+	 * @param id       the id to check
+	 * @return the position of the user , in order to the scores
+	 */
+	public static int showMyPos(int scenario, String id) {
 		int count = 0;
 		insertMap();
 		double sameGrade = topScore1(scenario, id);
@@ -140,25 +145,17 @@ public class recordsTable {
 			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword); // connection
 			Statement statement = connection.createStatement();
 			String allCustomersQuery = "SELECT userID ,MIN(moves), MAX(score),  levelID" + " FROM Logs"
-					+ " WHERE levelID ="+ scenario + " GROUP BY userID" + " ORDER BY MAX(score) DESC";
+					+ " WHERE levelID =" + scenario + " GROUP BY userID" + " ORDER BY MAX(score) DESC";
 			ResultSet resultSet = statement.executeQuery(allCustomersQuery);
 
 			while (resultSet.next()) {
 				if (resultSet.getInt("UserID") != Integer.parseInt(id)
 						&& resultSet.getInt("MIN(moves)") <= recordsTable.maxMoves.get(scenario)) {
-					if ( resultSet.getDouble("MAX(score)") != sameGrade) {
-						System.out.println("Id: " + resultSet.getInt("UserID") + ", level:\t"
-								+ resultSet.getInt("levelID") + ", score:\t" + resultSet.getDouble("MAX(score)")
-								+ ", moves:\t" + resultSet.getInt("MIN(moves)"));
+					if (resultSet.getDouble("MAX(score)") != sameGrade) {
 						count++;
 					}
 				} else if (resultSet.getInt("UserID") == 208888875
 						&& resultSet.getInt("MIN(moves)") <= recordsTable.maxMoves.get(scenario)) {
-					System.out.println("Id: " + resultSet.getInt("UserID") + ", level:\t" + resultSet.getInt("levelID")
-							+ ", score:\t" + resultSet.getDouble("MAX(score)") + ", moves:\t"
-							+ resultSet.getInt("MIN(moves)"));
-					System.out.println("my position in scenario " + scenario + " is: " + count);
-
 					break;
 				}
 
@@ -174,32 +171,38 @@ public class recordsTable {
 		}
 		return count;
 	}
-	
-	public static double topScore1(int scenario,String id) {
+
+	/**
+	 * this function return the top score according to given id, and level.
+	 * @param scenario the level to filter.
+	 * @param id the id to check
+	 * @return the top score the user got in a level.
+	 */
+	public static double topScore1(int scenario, String id) {
 		double max = -1;
 		recordsTable.insertMap();
-			String CustomersQuery = ("SELECT MAX(score) FROM Logs where userID="+id+ " AND levelID=" + scenario);
-			try {
-				Class.forName("com.mysql.jdbc.Driver");
-				Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
-				Statement statement = connection.createStatement();
-				ResultSet resultSet = statement.executeQuery(CustomersQuery);
-				while (resultSet.next()) {
-						max = resultSet.getDouble("MAX(score)");
-						System.out.println("the max score in level " + scenario + " is " +max);
-				}
-				resultSet.close();
-				statement.close();
-				connection.close();
-
-			} catch (SQLException sqle) {
-				System.out.println("SQLException: " + sqle.getMessage());
-				System.out.println("Vendor Error: " + sqle.getErrorCode());
+		String CustomersQuery = ("SELECT MAX(score) FROM Logs where userID=" + id + " AND levelID=" + scenario);
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(CustomersQuery);
+			while (resultSet.next()) {
+				max = resultSet.getDouble("MAX(score)");
+				System.out.println("the max score in level " + scenario + " is " + max);
 			}
+			resultSet.close();
+			statement.close();
+			connection.close();
 
-			catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+		} catch (SQLException sqle) {
+			System.out.println("SQLException: " + sqle.getMessage());
+			System.out.println("Vendor Error: " + sqle.getErrorCode());
+		}
+
+		catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		return max;
 	}
 
