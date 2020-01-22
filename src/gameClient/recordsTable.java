@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import utils.StdDraw;
+
 /**
  * This class represents a simple example of using MySQL Data-Base. Use this
  * example for writing solution.
@@ -21,23 +23,23 @@ public class recordsTable {
 	public static final String jdbcUserPassword = "OOP2020student";
 	public static MyGameGUI mygame;
 	private static HashMap<Integer, Integer> maxMoves = new HashMap<Integer, Integer>();
-
 	/**
 	 * Simple main for demonstrating the use of the Data-base
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		int id1 = 208888875; // "dummy existing ID
-		int level = 0;
-//		allUsers();
-//		printLog();
-		showMe();
-		topScores("208888875");
-		showMaxLevel("208888875");
-		// String kml = getKML(id1, level);
-		// System.out.println("data/" + level+".kml");
-		// System.out.println(kml);
+//		int id1 = 208888875; // "dummy existing ID
+//		int level = 0;
+////		allUsers();
+////		printLog();
+//		times();
+//		showMyPos(0);
+////		topScores("208888875");
+//		showMaxLevel("208888875");
+//		// String kml = getKML(id1, level);
+//		// System.out.println("data/" + level+".kml");
+//		// System.out.println(kml);
 
 	}
 
@@ -46,24 +48,21 @@ public class recordsTable {
 		double[] arr = new double[24];
 		for (int i = 0; i <= showMaxLevel(id); i++) {
 			double max = -1;
-			String CustomersQuery = ("SELECT * FROM Logs where userID=208888875 AND levelID=" + i);
+			String CustomersQuery = ("SELECT MAX(score) FROM Logs where userID="+id + " AND levelID=" + i);
 			try {
 				Class.forName("com.mysql.jdbc.Driver");
 				Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
 				Statement statement = connection.createStatement();
 				ResultSet resultSet = statement.executeQuery(CustomersQuery);
 				while (resultSet.next()) {
-					if (resultSet.getDouble("score") > max) {
-						max = resultSet.getDouble("score");
-					}
-				}
-				if (max != -1) { // should be with maxMove
-//						System.out.println("max score in level " + i + " is " + max);
-					arr[i] = max;
+						max = resultSet.getDouble("MAX(score)");
+						System.out.println("the max score in level " + i + " is " +max);
+						arr[i] = max;
 				}
 				resultSet.close();
 				statement.close();
 				connection.close();
+
 			} catch (SQLException sqle) {
 				System.out.println("SQLException: " + sqle.getMessage());
 				System.out.println("Vendor Error: " + sqle.getErrorCode());
@@ -103,8 +102,8 @@ public class recordsTable {
 		return maxLevel;
 	}
 
-	public static int showMe() {
-		String CustomersQuery = "SELECT * FROM Logs where userID=208888875";
+	public static int times(String id) {
+		String CustomersQuery = "SELECT * FROM Logs where userID="+id;
 		int count = 0;
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -131,35 +130,77 @@ public class recordsTable {
 		}
 		return count;
 	}
-	
-	public static int showMyPos(int scenario) {
-		ArrayList<Double> top = new ArrayList<Double>();
-		String CustomersQuery = "SELECT * FROM Logs where levelID="+scenario;
+
+	public static int showMyPos(int scenario , String id) {
+		int count = 0;
+		insertMap();
+		double sameGrade = topScore1(scenario, id);
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
+			Class.forName("com.mysql.jdbc.Driver"); // load data base
+			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword); // connection
 			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(CustomersQuery);
+			String allCustomersQuery = "SELECT userID ,MIN(moves), MAX(score),  levelID" + " FROM Logs"
+					+ " WHERE levelID ="+ scenario + " GROUP BY userID" + " ORDER BY MAX(score) DESC";
+			ResultSet resultSet = statement.executeQuery(allCustomersQuery);
+
 			while (resultSet.next()) {
-				double[] t = topScores(""+resultSet.getInt("userID"));
-				top.add(t[scenario]);
-				
+				if (resultSet.getInt("UserID") != Integer.parseInt(id)
+						&& resultSet.getInt("MIN(moves)") <= recordsTable.maxMoves.get(scenario)) {
+					if ( resultSet.getDouble("MAX(score)") != sameGrade) {
+						System.out.println("Id: " + resultSet.getInt("UserID") + ", level:\t"
+								+ resultSet.getInt("levelID") + ", score:\t" + resultSet.getDouble("MAX(score)")
+								+ ", moves:\t" + resultSet.getInt("MIN(moves)"));
+						count++;
+					}
+				} else if (resultSet.getInt("UserID") == 208888875
+						&& resultSet.getInt("MIN(moves)") <= recordsTable.maxMoves.get(scenario)) {
+					System.out.println("Id: " + resultSet.getInt("UserID") + ", level:\t" + resultSet.getInt("levelID")
+							+ ", score:\t" + resultSet.getDouble("MAX(score)") + ", moves:\t"
+							+ resultSet.getInt("MIN(moves)"));
+					System.out.println("my position in scenario " + scenario + " is: " + count);
+
+					break;
+				}
+
 			}
-			
-			top.s
 			resultSet.close();
 			statement.close();
 			connection.close();
 		} catch (SQLException sqle) {
 			System.out.println("SQLException: " + sqle.getMessage());
 			System.out.println("Vendor Error: " + sqle.getErrorCode());
-		}
-
-		catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		return 0;
-		
+		return count;
+	}
+	
+	public static double topScore1(int scenario,String id) {
+		double max = -1;
+		recordsTable.insertMap();
+			String CustomersQuery = ("SELECT MAX(score) FROM Logs where userID="+id+ " AND levelID=" + scenario);
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+				Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword);
+				Statement statement = connection.createStatement();
+				ResultSet resultSet = statement.executeQuery(CustomersQuery);
+				while (resultSet.next()) {
+						max = resultSet.getDouble("MAX(score)");
+						System.out.println("the max score in level " + scenario + " is " +max);
+				}
+				resultSet.close();
+				statement.close();
+				connection.close();
+
+			} catch (SQLException sqle) {
+				System.out.println("SQLException: " + sqle.getMessage());
+				System.out.println("Vendor Error: " + sqle.getErrorCode());
+			}
+
+			catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		return max;
 	}
 
 	public static void insertMap() {

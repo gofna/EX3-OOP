@@ -53,7 +53,9 @@ public class MyGameGUI implements Runnable {
 
 	public MyGameGUI() {
 		chooseScenario();
-		Game_Server.login(208888875);
+		if (StdDraw.id != null || StdDraw.id != "") {
+			Game_Server.login(Integer.parseInt(StdDraw.id));
+		}
 		this.game = Game_Server.getServer(this.scenario); // you have [0,23] games
 		StdDraw.game = this;
 		String g = game.getGraph();
@@ -239,7 +241,6 @@ public class MyGameGUI implements Runnable {
 		}
 	}
 
-
 	/**
 	 * this function start a automatic game if the user choose the automatic option.
 	 * the function get the best node to the robot (near the edge with a fruit with
@@ -321,28 +322,28 @@ public class MyGameGUI implements Runnable {
 				long dt = 100;
 				insertFruits();
 //				for (int j = 0; j < numOfRobots; j++) {
-					this.game = autoGame.moveRobots(this.game, this.graph, fruits);
-					try {
-						List<String> stat = game.getRobots();
-						for (int i = 0; i < stat.size(); i++) {
-							System.out.println(jj + ") " + stat.get(i));
-						}
-						Thread.sleep(dt);
-						jj++;
-					} catch (Exception e) {
-						e.printStackTrace();
+				this.game = autoGame.moveRobots(this.game, this.graph, fruits);
+				try {
+					List<String> stat = game.getRobots();
+					for (int i = 0; i < stat.size(); i++) {
+						System.out.println(jj + ") " + stat.get(i));
 					}
+					Thread.sleep(dt);
+					jj++;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			//			}
+			}
+			// }
 			drawRobot();
 			drawFruits();
 			StdDraw.show();
 
 		}
 		String results = this.game.toString();
-		BufferedReader objReader =null;
+		BufferedReader objReader = null;
 		try {
-			objReader = new BufferedReader(new FileReader("data/"+ this.scenario + ".kml"));
+			objReader = new BufferedReader(new FileReader("data/" + this.scenario + ".kml"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -358,7 +359,7 @@ public class MyGameGUI implements Runnable {
 				"time to end : " + this.game.timeToEnd() / 1000);
 		StdDraw.setPenRadius();
 	}
-	
+
 	/**
 	 * the function show the score of the game on the screen by using the server to
 	 * get the score. displaying the score on the window game by using stdDraw.
@@ -383,7 +384,7 @@ public class MyGameGUI implements Runnable {
 			fruit f = new fruit(f_iter.next().toString());
 			fruits.add(f);
 		}
-		
+
 	}
 
 	/*

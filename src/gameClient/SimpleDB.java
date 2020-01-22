@@ -5,6 +5,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import sun.swing.text.CountingPrintable;
 
 /**
  * This class represents a simple example of using MySQL Data-Base. Use this
@@ -27,13 +31,15 @@ public class SimpleDB {
 		int id1 = 208888875; // "dummy existing ID
 		int level = 0;
 //		allUsers();
-//		printLog();
-		showMe();
+		printLog();
+//		showMe();
 		String kml = getKML(id1, level);
 	//	System.out.println("data/" + level+".kml");
 		System.out.println(kml);
 		
 	}
+	
+	
 	
 	public static void showMe() {
 		String CustomersQuery = "SELECT * FROM Logs where userID=208888875";
@@ -67,16 +73,19 @@ public class SimpleDB {
 	 * 
 	 */
 	public static void printLog() {
+//		LinkedList<Integer> id = new LinkedList<Integer>();
+//		HashMap<Double, LinkedList<Integer>> sort = new HashMap<Double, LinkedList<Integer>>();
 		try {
 			Class.forName("com.mysql.jdbc.Driver"); // load data base
 			Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcUserPassword); // connection
 			Statement statement = connection.createStatement();
-			String allCustomersQuery = "SELECT * FROM Logs;";
+			String allCustomersQuery = "SELECT * FROM Logs";
 			ResultSet resultSet = statement.executeQuery(allCustomersQuery);
 
 			while (resultSet.next()) {
-				System.out.println("Id: " + resultSet.getInt("UserID") + "," + resultSet.getInt("levelID") + ","+
-						resultSet.getDouble("score")+ "," + resultSet.getInt("moves") + ","+resultSet.getInt("logID")+ ","  + resultSet.getDate("time"));
+				System.out.println("Id: " + resultSet.getInt("UserID") + ", level:\t" + resultSet.getInt("levelID")
+				+ ", score:\t" + resultSet.getDouble("score") + ", moves:\t" + resultSet.getInt("moves")+ ", numbre:\t" + resultSet.getInt("logID"));
+					
 			}
 			resultSet.close();
 			statement.close();

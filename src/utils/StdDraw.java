@@ -669,6 +669,7 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		width = canvasWidth;
 		height = canvasHeight;
 		init();
+		
 	}
 
 	// init
@@ -719,11 +720,14 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	private static JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar(); // create menu bar
 		JMenu file = new JMenu("File"); // Bottom
+		JMenu login = new JMenu("login");
 		JMenu features = new JMenu("start"); // bottom
 		JMenu records = new JMenu("records"); 
 		menuBar.add(file);
+		menuBar.add(login);
 		menuBar.add(features);
 		menuBar.add(records);
+		JMenuItem login1 = new JMenuItem(" login");
 		JMenuItem save = new JMenuItem(" Save as KML");
 		JMenuItem manual = new JMenuItem("start manual game");
 		JMenuItem automatic = new JMenuItem("start automatic game");
@@ -731,11 +735,12 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		JMenuItem r2 = new JMenuItem(" my max level");
 		JMenuItem r3 = new JMenuItem(" my records");
 		JMenuItem r4 = new JMenuItem(" my position");	
+		login1.addActionListener(std);
 		save.addActionListener(std);
-
 		save.setAccelerator(
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
+		login.add(login1);
 		manual.addActionListener(std);
 		automatic.addActionListener(std);
 		r1.addActionListener(std);
@@ -750,6 +755,8 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 		records.add(r3);
 		records.add(r4);
 		return menuBar;
+		
+		
 	}
 
 	/***************************************************************************
@@ -1736,32 +1743,33 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 	 */
 
 	public static MyGameGUI game;
+	public static String id = "";
 
 	public void actionPerformed(ActionEvent e) {
 		String str = e.getActionCommand();
 		if (str.equals("start manual game")) {
 			StdDraw.clear();
 			game = new MyGameGUI();
-			this.game.auto = false;
-			this.game.getGame().stopGame();
+			game.auto = false;
+			game.getGame().stopGame();
 			game.placeRobot();
 
 		}
 		if (str.equals("start automatic game")) {
 			game = new MyGameGUI();
-			this.game.auto = true;
-			this.game.start();
+			game.auto = true;
+			game.start();
 
 		}
 
 		if (str.equals(" Save as KML")) {
 			try {
-				if (this.game.game.isRunning()) {
+				if (game.game.isRunning()) {
 					JFrame saved = new JFrame();
 					JOptionPane.showMessageDialog(saved, "sorry, wait to the end of the game.");
 				}
 				else {
-					KML_Loger.createKMLFile(this.game.scenario);
+					KML_Loger.createKMLFile(game.scenario);
 					JFrame saved = new JFrame();
 					JOptionPane.showMessageDialog(saved, "your game is saved!");
 				}
@@ -1774,17 +1782,24 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 
 
 		if (str.equals(" number of my games ")) {
+			if (StdDraw.id != "") {
 			JFrame games = new JFrame();
-			JOptionPane.showMessageDialog(games, "you played : "+ recordsTable.showMe() + " times!");
+			JOptionPane.showMessageDialog(games, "you played : "+ recordsTable.times(id) + " times!");
+			}
+			else openNotLogin();
 		}
 
 		if (str.equals(" my max level")) {
+			if (StdDraw.id != "") {
 			JFrame level = new JFrame();
-			JOptionPane.showMessageDialog(level, "you'r maximum level is "+ recordsTable.showMaxLevel("208888875"));
+			JOptionPane.showMessageDialog(level, "you'r maximum level is "+ recordsTable.showMaxLevel(id));
+			}
+			else openNotLogin();
 		}
 
 		if (str.equals(" my records")) {
-			double[] arr = recordsTable.topScores("208888875");
+			if (StdDraw.id != "") {
+			double[] arr = recordsTable.topScores(id);
 			JFrame top = new JFrame();
 			JOptionPane.showMessageDialog(top, "you'r records : \n" 
 					+"in level 0    " + arr[0] + "\n"
@@ -1798,14 +1813,33 @@ public class StdDraw implements ActionListener, MouseListener, MouseMotionListen
 					+"in level 19   " + arr[19] + "\n"
 					+"in level 20   " + arr[20] + "\n"
 					+"in level 23   " + arr[23]);
-																							;
+			}
+			else openNotLogin();
 
 		}
 		
 		if (str.equals(" my position")) {
-
+			if (StdDraw.id != "") {
+			JFrame level = new JFrame();
+			String scenario_num = JOptionPane.showInputDialog(level, "insert a level 0 - 23:");
+			int scenario = Integer.parseInt(scenario_num);
+			int position= recordsTable.showMyPos(scenario , id);
+			JFrame pos = new JFrame();
+			JOptionPane.showMessageDialog(pos, "you'r positon in level "+ scenario +  " is :  " +position);
+			}
+			else openNotLogin();
 		}
-
+		
+		if (str.equals(" login")) {
+			JFrame login = new JFrame();
+			id = JOptionPane.showInputDialog(login, "please insert you'r id :");
+			
+		}
+	}
+	
+	public static void openNotLogin(){
+		JFrame NOTlogin = new JFrame();
+		JOptionPane.showMessageDialog(NOTlogin, "pleas login first");
 	}
 
 	/***************************************************************************
