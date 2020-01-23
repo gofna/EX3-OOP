@@ -26,14 +26,22 @@ public class KML_Loger {
 	 * @param y the y position
 	 * @param element the element to document in the file(robot, banana or apple).
 	 */
-	public static void createPlacemark(double x, double y, String element) {
+	public static void createPlacemark(double x, double y, String element, boolean even, long time) {
 		if (x == 0 & y == 0) {
 
 		} else {
+			if(even) {
 			kmlelement += "<Placemark>\n" + "<TimeStamp>\n" + "<when>" + time() + "</when>\n" + "</TimeStamp>\n"
 					+ "<styleUrl>#" + element + "</styleUrl>\n" + "<Point>\n" + "<coordinates>" + x + "," + y
-					+ "</coordinates>\n" + "</Point>\n" + "<TimeSpan>\n" + "<begin>" + 1 + "</begin>\n" + "<end>"
-					+ 0 + "</end>\n" + "</TimeSpan>\n" + "</Placemark>\n";
+					+ "</coordinates>\n" + "</Point>\n" + "<TimeSpan>\n" + "<begin>" + (30-time/1000) + "</begin>\n" + "<end>"
+					+ ((30-time/1000)+1) + "</end>\n" + "</TimeSpan>\n" + "</Placemark>\n";
+			}
+			else {
+				kmlelement += "<Placemark>\n" + "<TimeStamp>\n" + "<when>" + time() + "</when>\n" + "</TimeStamp>\n"
+						+ "<styleUrl>#" + element + "</styleUrl>\n" + "<Point>\n" + "<coordinates>" + x + "," + y
+						+ "</coordinates>\n" + "</Point>\n" + "<TimeSpan>\n" + "<begin>" + (60-time/1000) + "</begin>\n" + "<end>"
+						+ ((60-time/1000)+1) + "</end>\n" + "</TimeSpan>\n" + "</Placemark>\n";
+			}
 		}
 	}
 

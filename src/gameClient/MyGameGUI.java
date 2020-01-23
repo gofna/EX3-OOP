@@ -53,7 +53,7 @@ public class MyGameGUI implements Runnable {
 
 	public MyGameGUI() {
 		chooseScenario();
-		if (StdDraw.id != null || StdDraw.id != "") {
+		if (StdDraw.id != null && StdDraw.id != "") {
 			Game_Server.login(Integer.parseInt(StdDraw.id));
 		}
 		this.game = Game_Server.getServer(this.scenario); // you have [0,23] games
@@ -207,7 +207,7 @@ public class MyGameGUI implements Runnable {
 					Point3D p = new Point3D(pos);
 					StdDraw.picture(p.x(), p.y(), "data/robot.PNG", 0.002, 0.001);
 					if (p != null) {
-						KML_Loger.createPlacemark(p.x(), p.y(), "ski");
+						KML_Loger.createPlacemark(p.x(), p.y(), "ski", scenario%2 == 0 , game.timeToEnd()); //if scenario even - 30 sec
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -233,9 +233,9 @@ public class MyGameGUI implements Runnable {
 			StdDraw.picture(fr.getLocation().x(), fr.getLocation().y(), fr.getImage(), 0.001, 0.0007);
 			if (fr != null) {
 				if (fr.getType() == -1) {
-					KML_Loger.createPlacemark(fr.getLocation().x(), fr.getLocation().y(), "banana");
+					KML_Loger.createPlacemark(fr.getLocation().x(), fr.getLocation().y(), "banana",scenario%2 == 0 , game.timeToEnd() );
 				} else {
-					KML_Loger.createPlacemark(fr.getLocation().x(), fr.getLocation().y(), "apple");
+					KML_Loger.createPlacemark(fr.getLocation().x(), fr.getLocation().y(), "apple", scenario%2 == 0 , game.timeToEnd());
 				}
 			}
 		}
