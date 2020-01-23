@@ -82,5 +82,6 @@ to the vertices value and edges on the graph. - put an image in size that
 
 
 for more details and information about the program you can find on wiki.
+
 Enjoy the game!
 
